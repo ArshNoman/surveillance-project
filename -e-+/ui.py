@@ -106,7 +106,6 @@ def main_login():
         usernameentry.delete(0, END)
         passwordentry.delete(0, END)
 
-        file_list = os.listdir()
         if username_given == "" or password_given == "":
             messagebox.showerror('Empty space found', 'All fields are required to be filled | 所有字段都必须填写')
 
@@ -157,24 +156,6 @@ def main_login():
             new_folder.title("View Violations")
             new_folder.geometry("320x220")
             new_folder.resizable(False, False)
-            # new_folder.iconbitmap("C:/Users/PC/Desktop/7/logo.ico")
-
-            # def create_folder():
-            #
-            #     if title.get() == '':
-            #         messagebox.showerror('Name Empty', 'Your file name cannot be empty!')
-            #     else:
-            #
-            #         def createFolder(directory):
-            #             try:
-            #                 if not os.path.exists(directory):
-            #                     os.makedirs(directory)
-            #                     new_folder.destroy()
-            #             except OSError:
-            #                 messagebox.showerror('Error', 'No such directory, please contact the developer.')
-            #             new_folder.destroy()
-            #
-            #         createFolder('./' + folders + '/{}/'.format(title.get()))
 
             title = ttk.Entry(new_folder, width=48)
             confirm_create = Button(new_folder, text='Create New Folder', command=create_folder)

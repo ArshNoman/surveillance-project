@@ -1,6 +1,6 @@
 # 此文件用于测试功能
 
-# import tensorflow as tf
+import tensorflow as tf
 import numpy as np
 import cv2
 
@@ -16,16 +16,26 @@ net = predict.predict_cnn
 
 cap = cv2.VideoCapture(0)
 
-def image(image):
+def image(image, clss, u, dir):
     # is_violation = False
     is_violation = net(image)
     print(is_violation)
     # Save the picture to the database
     if is_violation:
-        pass
+        with open(dir, 'rb') as File:
+            binary = File.read()
+
+    db.ping()
+
+    cursor.execute("SELECT violations FROM classes WHERE user = (%s) and name = (%s)", (u, clss))
+    violations = ast.literal_eval(cursor.fetchall()[0][0])
+    violations.append(binary)
+    violations = str(violations)
+
+    cursor.execute("UPDATE classes SET violations = (%s) WHERE user = (%s) and name = (%s)", (violations, u, clss))
 
 
-def video():
+def video(clss, user):
     b_was_show_tip = False
     is_violation = False
     while True:
@@ -39,27 +49,36 @@ def video():
         print(is_violation)
         # Save the picture to the database
         if is_violation:
-            pass
+            with open(frame, 'rb') as File:
+                binary = File.read()
 
+        db.ping()
 
+        cursor.execute("SELECT violations FROM classes WHERE user = (%s) and name = (%s)", (u, clss))
+        violations = ast.literal_eval(cursor.fetchall()[0][0])
+        violations.append(binary)
+        violations = str(violations)
 
+        cursor.execute("UPDATE classes SET violations = (%s) WHERE username = (%s) and name = (%s)", (violations, u, clss))
 
 
 def main():
 
-    mode = "image"  # video/image
+    #mode = "image"  # video/image
     # mode = "video"  # video/image
     # mode = "test"
 
+    mode = input('what mode: ')
+    clss = input('what class: ') # 回复 : 10C
+    user = input('username: ') #  回复 : 1
+
     if mode == "image":
-        im = cv2.imread("images/5_0.jpg")
-        image(im)
+        dir = "images/5_0.jpg"
+        im = cv2.imread(dir)
+        image(im, clss, user, dir)
         cv2.waitKey(0)
 
     elif mode == "video":
-        video()
-
-
-
+        video(clss, user)
 
 main()
