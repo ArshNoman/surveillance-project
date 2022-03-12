@@ -159,22 +159,22 @@ def main_login():
             new_folder.resizable(False, False)
             # new_folder.iconbitmap("C:/Users/PC/Desktop/7/logo.ico")
 
-            def create_folder():
-
-                if title.get() == '':
-                    messagebox.showerror('Name Empty', 'Your file name cannot be empty!')
-                else:
-
-                    def createFolder(directory):
-                        try:
-                            if not os.path.exists(directory):
-                                os.makedirs(directory)
-                                new_folder.destroy()
-                        except OSError:
-                            messagebox.showerror('Error', 'No such directory, please contact the developer.')
-                        new_folder.destroy()
-
-                    createFolder('./' + folders + '/{}/'.format(title.get()))
+            # def create_folder():
+            #
+            #     if title.get() == '':
+            #         messagebox.showerror('Name Empty', 'Your file name cannot be empty!')
+            #     else:
+            #
+            #         def createFolder(directory):
+            #             try:
+            #                 if not os.path.exists(directory):
+            #                     os.makedirs(directory)
+            #                     new_folder.destroy()
+            #             except OSError:
+            #                 messagebox.showerror('Error', 'No such directory, please contact the developer.')
+            #             new_folder.destroy()
+            #
+            #         createFolder('./' + folders + '/{}/'.format(title.get()))
 
             title = ttk.Entry(new_folder, width=48)
             confirm_create = Button(new_folder, text='Create New Folder', command=create_folder)
@@ -197,10 +197,74 @@ def main_login():
             # open_files.iconbitmap("C:/Users/PC/Desktop/7/logo.ico")
             classes.resizable(False, False)
 
+            def removeclass():
+                db.ping()
+                cursor.execute("SELECT classes FROM users WHERE username = (%s)", (session_user,))
+                clist = ast.literal_eval(cursor.fetchall()[0][0])
+
+                selected = listbox.curselection()
+                selected = int(selected[0])
+                selected_class = clist[selected]
+
+                db.ping()
+
+                cursor.execute("SELECT classes FROM users WHERE username = (%s)", (session_user))
+                current_classes = ast.literal_eval(cursor.fetchall()[0][0])
+                current_classes.remove(selected_class)
+                current_classes = str(current_classes)
+
+                cursor.execute("UPDATE users SET classes = (%s) WHERE username = (%s)", (current_classes, session_user))
+                
+                cursor.execute("DELETE FROM classes WHERE user = (%s) AND name = (%s)", (session_user, selected_class))
+
+                classes.destroy()
+
+            def addclass():
+
+                new_folder = Toplevel(root)
+                new_folder.title("Add a class")
+                new_folder.geometry("320x220")
+                new_folder.resizable(False, False)
+
+                # new_folder.iconbitmap("C:/Users/PC/Desktop/7/logo.ico")
+
+                def adddclass():
+
+                    if title.get() == '':
+                        messagebox.showerror('Name Empty', 'Your class name cannot be empty!')
+                    else:
+                        db.ping()
+
+                        cursor.execute("SELECT classes FROM users WHERE username = (%s)", (session_user))
+                        current_classes = ast.literal_eval(cursor.fetchall()[0][0])
+                        classname = title.get()
+                        current_classes.append(classname)
+                        current_classes = str(current_classes)
+
+                        cursor.execute("UPDATE users SET classes = (%s) WHERE username = (%s)", (current_classes, session_user))
+
+                        cursor.execute("INSERT INTO classes VALUES (%s, '[]', %s)", (session_user, classname))
+
+                    new_folder.destroy()
+                    classes.destroy()
+
+                title = ttk.Entry(new_folder, width=48)
+                confirm_create = Button(new_folder, text='Add new class', command=adddclass)
+
+                Label(new_folder).grid(row=0, column=0)
+                Label(new_folder).grid(row=0, column=1)
+                Label(new_folder, text='Enter class name').grid(row=1, column=2)
+                Label(new_folder).grid(row=2, column=1)
+                title.grid(row=3, column=2)
+                Label(new_folder).grid(row=4, column=1)
+                Label(new_folder).grid(row=5, column=1)
+                Label(new_folder).grid(row=6, column=1)
+                confirm_create.grid(row=7, column=2)
+
             listbox = Listbox(classes)
             empty = Label(classes)
-            empty2 = Label(classes)
-            add_classes = Button(classes, text='Add a class', width=25)
+            add_classes = Button(classes, text='Add a class', width=15, command=addclass)
+            remove_classes = Button(classes, text='Remove class', width=15, command=removeclass)
             your_classes_label = Label(classes, text='Your classes')
             listbox.config(width=100)
 
@@ -208,22 +272,22 @@ def main_login():
             cursor.execute("SELECT classes FROM users WHERE username = (%s)", (session_user,))
             class_list = ast.literal_eval(cursor.fetchall()[0][0])
 
+            empty.grid(row=0, column=0)
             try:
                 if class_list != []:
                     for files_1 in class_list:
-                        index = 0
+                        index = len(class_list)
                         listbox.insert(index, files_1)
-                        listbox.pack()
-                        index += 1
+                        listbox.grid(row=0, column=1)
+                        index -= 1
                 else:
                     listbox.insert(0, 'No Classes Available')
-                    listbox.grid(row=0, column=0)
+                    listbox.grid(row=0, column=1)
             except: pass
-
-            empty.grid(row=1, column=0)
-            empty2.grid(row=)
-            your_classes_label.grid(row=2, column=1)
-            add_classes.grid(row=3, column=1)
+            
+            add_classes.grid(row=0, column=2)
+            remove_classes.grid(row=1, column=2)
+            your_classes_label.grid(row=3, column=1)
 
             classes.mainloop()
 
