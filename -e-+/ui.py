@@ -249,11 +249,9 @@ def main_login():
                         button_forward.grid(row=1, column=2)
 
                     button_back = Button(viewing, text='<<', command=lambda: back())
-                    button_quit = Button(viewing, text='Exit | 出口', command=viewing.destroy())
                     button_forward = Button(viewing, text='>>', command=lambda: next(2))
 
                     button_back.grid(row=1, column=0)
-                    button_quit.grid(row=1, column=1)
                     button_forward.grid(row=1, column=2)
 
                     viewing.mainloop()
@@ -327,8 +325,6 @@ def main_login():
                     new_folder.geometry("320x220")
                     new_folder.resizable(False, False)
 
-                    # new_folder.iconbitmap("C:/Users/PC/Desktop/7/logo.ico")
-
                     def adddclass():
 
                         if title.get() == '':
@@ -364,7 +360,7 @@ def main_login():
 
                 listbox = Listbox(classes)
                 empty = Label(classes)
-                add_classes = Button(classes, text='Add a class | 添加新班级', width=15, command=addclass)
+                add_classes = Button(classes, text='Add class | 添加新班级', width=15, command=addclass)
                 remove_classes = Button(classes, text='Remove class | 删除类', width=15, command=removeclass)
                 your_classes_label = Label(classes, text='Your classes | 你的课')
                 listbox.config(width=100)
