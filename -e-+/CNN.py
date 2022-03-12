@@ -2,9 +2,9 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 import os
 
-tf.disable_eager_execution()
-physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
+# tf.disable_eager_execution()
+# physical_devices = tf.config.list_physical_devices('GPU')
+# tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 
 def softmax(x):
     probs = np.exp(x - np.max(x))

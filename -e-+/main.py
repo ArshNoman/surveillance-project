@@ -7,6 +7,8 @@ import cv2
 import attitude
 import identify
 import predict
+import pymysql
+import ast
 
 attitude_net = attitude.attitude()
 capture = identify.capture()
@@ -16,23 +18,36 @@ net = predict.predict_cnn
 
 cap = cv2.VideoCapture(0)
 
+db = pymysql.connect(
+    host="byyikg99odchbcly6vrw-mysql.services.clever-cloud.com",
+    user="ubyvkstgmoy2hv2b",
+    password="glxQ8H6nSNzoNROmdPqt",
+    database="byyikg99odchbcly6vrw",
+    autocommit=True)
+
+cursor = db.cursor()
+
+db.ping()  # reconnecting mysql
+if cursor.connection is None:
+    db.ping()
+
 def image(image, clss, u, dir):
     # is_violation = False
     is_violation = net(image)
-    print(is_violation)
+    is_violation = True
     # Save the picture to the database
     if is_violation:
+        print('is violation 1111111111111111111111')
         with open(dir, 'rb') as File:
             binary = File.read()
 
-    db.ping()
+        cursor.execute("SELECT violations FROM classes WHERE user = (%s) and name = (%s)", (u, clss))
+        violations = ast.literal_eval(cursor.fetchall()[0][0])
+        violations.append(binary)
+        violations = str(violations)
 
-    cursor.execute("SELECT violations FROM classes WHERE user = (%s) and name = (%s)", (u, clss))
-    violations = ast.literal_eval(cursor.fetchall()[0][0])
-    violations.append(binary)
-    violations = str(violations)
-
-    cursor.execute("UPDATE classes SET violations = (%s) WHERE user = (%s) and name = (%s)", (violations, u, clss))
+        cursor.execute("UPDATE classes SET violations = (%s) WHERE user = (%s) and name = (%s)", (violations, u, clss))
+        db.ping()
 
 
 def video(clss, user):
@@ -68,12 +83,12 @@ def main():
     # mode = "video"  # video/image
     # mode = "test"
 
-    mode = input('what mode: ')
+    mode = input('what mode: ') # image
     clss = input('what class: ') # 回复 : 10C
     user = input('username: ') #  回复 : 1
 
     if mode == "image":
-        dir = "images/5_0.jpg"
+        dir = "images/4_0.jpg"
         im = cv2.imread(dir)
         image(im, clss, user, dir)
         cv2.waitKey(0)
